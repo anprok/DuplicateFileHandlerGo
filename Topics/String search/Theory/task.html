@@ -1,0 +1,147 @@
+<h2>String search</h2>
+<html><body><p>Before anything else, you need to know that strings are immutable. This means you can't change any character or letter inside a string. If you want to alter it in any way, you can rewrite the whole string. Besides, you can get some information about a string using special <strong>helpers</strong> <em>— </em>functions that you can find in the <code class="language-go">strings</code> library. In this topic, you will learn how these functions work and when to use them.</p>
+<h5 id="prefix-and-suffix">Prefix and suffix</h5>
+<p>How can you check if a string begins with a certain sequence of characters or ends with it? The <code class="language-go">strings</code> library contains two functions to help you answer this question: <code class="language-go">HasPrefix</code> and <code class="language-go">HasSuffix</code>. Both return a boolean value and take two arguments: the string to search in, and the substring to search.</p>
+<p><code class="language-go">HasPrefix</code> begins to search from the left side of the string, and returns <code class="language-go">true</code> if the string begins with the substring we've passed as its argument. <code class="language-go">HasSuffix</code>, on the contrary, begins to search from the right side, and returns <code class="language-go">true</code> if the string ends with the substring in question. Both these functions search for a <strong>complete match</strong>. It means that they draw a distinction between capital and lowercase letters. Have a look at the implementation of <code class="language-go">HasPrefix</code> and <code class="language-go">HasSuffix</code>:</p>
+<pre><code class="language-go">package main
+
+import(
+    "fmt"
+    "strings"
+)
+
+func main() {
+    var source string = "HyperSkill"
+    var prefix string = "Hype"
+
+    hasPrefix := strings.HasPrefix(source, prefix)
+    hasSuffix := strings.HasSuffix(source, "LL")
+  
+    fmt.Println(hasPrefix)
+    fmt.Println(hasSuffix)
+}
+
+// Output:
+// true
+// false</code></pre>
+<h5 id="contains">Contains </h5>
+<p>Now, let's imagine you want to find a specific pattern within a string, but you don't know where exactly it is. It can be at the beginning or at the end of the string you have, or it can be placed in the middle of it. All you know is that the pattern should be inside the string. Golang has a helper that searches for a substring within the whole length of a string, it's called <code class="language-go">Contains</code>.</p>
+<p>Like the functions we've discussed in the previous section, <code class="language-go">Contains</code> returns a boolean value, <code class="language-go">true</code> in the case if the pattern occurs at least once in the string. It also needs a complete match to find the pattern.</p>
+<pre><code class="language-go">package main
+
+import(
+    "fmt"
+    "strings"
+)
+
+func main() {
+    var source string = "Test string for Contains"
+  
+    fmt.Println(strings.Contains(source, "for"))
+    fmt.Println(strings.Contains(source, "test"))
+}
+
+// Output:
+// true
+// false</code></pre>
+<p> </p>
+<p></p><div class="alert alert-primary"> Remember that whitespace is also a character, and a string like <code class="language-go">" for"</code> would not equal to <code class="language-go">"for"</code>.</div>
+<p> </p>
+<h5 id="index">Index</h5>
+<p>What if you want not only to know whether a string contains a substring, but also the exact place of this substring? The following functions also search for a substring, just like the ones we've seen before, but they return an integer number. This number is the index of the beginning or the ending of the first instance of a substring in a string. The names of the functions are <code class="language-go">Index</code> (for the beginning of a substring) and <code class="language-go">LastIndex</code> (for the ending of a substring).</p>
+<p><code class="language-go">Index</code> performs search from left to right, and <code class="language-go">LastIndex</code> searches from right to left. Both methods return a number between zero and the string length in case the string contains the desired substring, and otherwise they return <code class="language-go">-1</code>. You can see an example of implementing these functions below:</p>
+<pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    var source string = "Who is who in Doctor Who?"
+
+    fmt.Println(strings.Index(source, "Who"))
+    fmt.Println(strings.LastIndex(source, "Who"))
+    fmt.Println(strings.Index(source, "doctor"))
+}
+
+// Output:
+// 0
+// 21
+// -1</code></pre>
+<p>When you work with strings, you often need to know the indexes of all occurrences of a substring. However, the indexing methods return only one number. To solve this problem, we use knowledge about string slices and Golang loops. The following piece of code prints indexes in the order of pattern appearance:</p>
+<pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    var source string = "Will Will Smith smith Will Smith?"
+  
+    i := 0
+    n := strings.Index(source, "Will")
+
+    for i != -1 {
+        fmt.Println(n)
+
+        i = strings.Index(source[n+1:], "Will")
+        n = n + i + 1
+    }
+}
+
+// Output:
+// 0
+// 5
+// 22</code></pre>
+<h5 id="count">Count</h5>
+<p>Let's return to the function <code class="language-go">Contains</code>. It tells about a pattern contained in a string, but what if you want to know how many times a substring is repeated in a string? Like in the all-index-search program above, you can come up with a way to do it by using decreasing slices and <code class="language-go">Contains</code>, but the <code class="language-go">strings</code> library includes a feature that does it for you.</p>
+<p>The function is called <code class="language-go">Count</code>, and that's exactly what it does: it counts. It takes the source string and the substring, and returns the number of instances the substring occurs in the source string:</p>
+<pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    fmt.Println(strings.Count("Perpetuum mobile", "e"))
+    fmt.Println(strings.Count("Perpetuum mobile", "z"))
+    fmt.Println(strings.Count("Perpetuum mobile", ""))
+}
+
+// Output:
+// 3
+// 0
+// 17</code></pre>
+<p> </p>
+<p></p><div class="alert alert-primary"> An empty string <code class="language-go">""</code> is a special case that deserves a comment. If you use the <code class="language-go">Count</code> function to give you the number of empty string symbols, regardless of the string you use, the function will return a number that is greater than the string length by one. How can it be? The trick is the beginning of the string: the function will consider the space before the first character as an empty string, and will add it to the spaces between characters and the space between the last character and the end of the string: <code class="language-go">"of" -&gt; "&lt;empty&gt;o&lt;empty&gt;f&lt;empty&gt;"</code>. </div>
+<p> </p>
+<h5 id="case-insensitive-comparison">Case insensitive comparison</h5>
+<p>All the previous functions use complete matches when searching for a substring. And, for example, capital <code class="language-go">F</code> for them is not the same thing as an <code class="language-go">f</code>. Golang has functions that can convert all symbols in a string to upper or lower case. However, by using these methods we would modify strings, and in this topic, we talk about features that tell us something about a string but do not change it.</p>
+<p>The last function we'll consider for now is <code class="language-go">EqualFold</code>: it helps us compare two strings in different cases. <code class="language-go">EqualFold</code> takes two strings as arguments, and returns <code class="language-go">true</code> if the strings contain the same text and <code class="language-go">false</code> if they don't. It works as follows:</p>
+<pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    fmt.Println(strings.EqualFold("Hello", "hello"))
+    fmt.Println(strings.EqualFold("Hi!", "hi"))
+}
+
+// Output:
+// true
+// false</code></pre>
+<h5 id="conclusion">Conclusion</h5>
+<p>In this topic, you've learned about functions that help us search for something in strings. Here are the bullet points of what we've covered in the previous sections:</p>
+<ul>
+<li>All the helping functions from this topic (except <code class="language-go">EqualFold</code>) take the source string and the substring as arguments;</li>
+<li><code class="language-go">EqualFold</code> takes two strings to compare;</li>
+<li><code class="language-go">HasPrefix</code>, <code class="language-go">HasSuffix</code>, <code class="language-go">Contains</code>, and <code class="language-go">EqualFold</code> return a boolean value;</li>
+<li><code class="language-go">Index</code>, <code class="language-go">LastIndex</code>, and <code class="language-go">Count</code> return an integer number.</li>
+</ul>
+<p>You will certainly make use of these functions not once when coding in Go, starting with some practice right in the following steps of this topic!</p></body></html>

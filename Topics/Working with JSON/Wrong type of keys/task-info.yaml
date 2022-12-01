@@ -1,0 +1,18 @@
+type: code
+custom_name: Wrong type of keys!
+files:
+- name: main.go
+  visible: true
+  text: "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"log\"\n)\n\n\
+    func main() {\n    // HINT: The error is within the 'medals' map declaration:\n\
+    \tmedals := map[interface{}]string{\n\t\t\"first\":  \"Gold\",\n\t\t\"second\"\
+    : \"Silver\",\n\t\t\"third\":  \"Bronze\",\n\t}\n\n\tmedalsJSON, err := json.Marshal(medals)\n\
+    \tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tfmt.Println(string(medalsJSON))\n\
+    }"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/23544#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Tue, 22 Nov 2022 06:11:03 UTC"
+record: -1

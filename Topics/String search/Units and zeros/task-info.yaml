@@ -1,0 +1,26 @@
+type: code
+files:
+- name: main.go
+  visible: true
+  text: |-
+    package main
+
+    import (
+      "fmt"
+      "strings"
+    )
+
+    func main() {
+      var source string
+
+      fmt.Scan(&source)
+
+      // Your code here
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/19002#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Thu, 01 Dec 2022 23:00:28 UTC"
+record: -1

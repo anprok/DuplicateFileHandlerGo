@@ -1,0 +1,87 @@
+type: remote_edu
+files:
+- name: tests.py
+  visible: false
+  text: |-
+    import os
+
+    from hstest import StageTest, CheckResult, WrongAnswer, TestCase
+
+    SHA512_output = ["090ed565b68782cf59752744201d6fb860423854e568eec76cff2f87bc817f817370d7a977a3e379e0f493590c87c543e5401d68ba61f363a582ba043a375889"]
+
+    FILENAME = "secret_formula.txt"
+
+
+    class TestAdmissionProcedure(StageTest):
+        def generate(self):
+            return [TestCase(stdin=[test], attach=[test]) for test in SHA512_output]
+
+        def check(self, reply: str, clue: str):
+            if not os.path.exists(FILENAME):
+                raise WrongAnswer(f"Cannot find file {FILENAME}")
+
+            if clue[0].rstrip() != reply.rstrip():
+                raise WrongAnswer(
+                    f"Incorrect! 😵❌ Wrong answer!\n"
+                    f"Your program printed:\n{reply.rstrip()}\n"
+                    f"\nAre you sure you properly opened {FILENAME}?")
+
+            print(f"\nWell done! Mr. Krabs says thanks!\n")
+            return CheckResult.correct()
+
+    if __name__ == '__main__':
+        TestAdmissionProcedure().run_tests()
+  learner_created: false
+- name: secret_formula.txt
+  visible: false
+  text: |
+    Flour
+    Barnacles Shavings
+    Salt
+    Turmeric
+    Love
+    The "secret sauce"
+    Chum
+  learner_created: false
+- name: main.go
+  visible: true
+  text: |-
+    package main
+
+    import (
+        "crypto/sha512"
+        "fmt"
+        "io"
+        "log"
+        "os"
+    )
+
+    func main() {
+        // DO NOT delete this code block! Mr. Krabs wrote it to open the "secret_formula.txt" file.
+        file, err := os.Open("secret_formula.txt")
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer file.Close()
+
+        // Use the correct function to create a 'new' SHA-512 Hash interface below:
+        sha512Hash := sha512.?()
+
+        // Copy the data from 'secret_formula.txt' to the 'sha512Hash'
+        // Using the correct function from the `io` package:
+        if _, err := io.?(?, ?); err != nil {
+            log.Fatal(err)
+        }
+
+        // Call the method that returns the computed SHA-512 hash slice of the file:
+        // And print the hash in hexadecimal notation below:
+        fmt.Printf("%x\n", sha512Hash.?(nil))
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/19071#comment
+check_profile: hyperskill_go
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Tue, 22 Nov 2022 16:07:40 UTC"
+record: -1

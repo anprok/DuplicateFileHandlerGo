@@ -1,0 +1,19 @@
+type: choice
+is_multiple_choice: true
+options:
+- text: bcrypt
+- text: SHA-256/SHA-512
+- text: Blowfish
+- text: MD5
+- text: salt
+files:
+- name: main.go
+  visible: true
+  text: |+
+    // You can experiment here, it won’t be checked
+
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/19065#comment
+status: Solved
+record: -1
+local_check: false

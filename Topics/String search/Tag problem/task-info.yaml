@@ -1,0 +1,33 @@
+type: code
+files:
+- name: main.go
+  visible: true
+  text: |-
+    package main
+
+    import (
+        "fmt"
+        "strings"
+    )
+
+    func main() {
+        var source string
+
+        fmt.Scan(&source)
+
+        openingTagStart := strings.Index(source, "<")
+        openingTagEnd := strings.Index(?, ">")
+
+        closingTagStart := strings.LastIndex(source, ?)
+        closingTagEnd := strings.LastIndex(?, ?)
+
+        fmt.Printf("%d %d\n", openingTagStart, openingTagEnd)
+        fmt.Printf("%d %d\n", ?, ?)
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/19001#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Thu, 01 Dec 2022 23:11:46 UTC"
+record: -1

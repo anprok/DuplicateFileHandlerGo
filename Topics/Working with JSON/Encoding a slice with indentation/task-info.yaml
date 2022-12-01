@@ -1,0 +1,14 @@
+type: code
+files:
+- name: main.go
+  visible: true
+  text: "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"log\"\n)\n\n\
+    func main() {\n\t// DO NOT delete the code block below, it populates the 'fruits'\
+    \ slice!\n\tvar f1, f2, f3 string\n\tfmt.Scanln(&f1, &f2, &f3)\n\tfruits := []string{f1,\
+    \ f2, f3}\n\n\t// Remember to specify 4 blank spaces \"    \" as the indent parameter\
+    \ below:\n\tfruitsJSON, err := json.MarshalIndent(?, ?, ?)\n\tif err != nil {\n\
+    \t\tlog.Fatal(err)\n\t}\n\tfmt.Println(?(?))\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/23543#comment
+status: Solved
+record: -1

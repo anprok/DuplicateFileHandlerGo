@@ -1,0 +1,130 @@
+<h2>Hashing strings and files</h2>
+<html><body><p>You are already familiar with hashing, and know that through <strong>hash functions</strong> we can compute the hash value of a string and even the hash value of a file. The next step is to find out how we can use Go to compute hash values.</p>
+<p>In this topic, we'll learn how to use the <code class="language-go">crypto</code> package to compute hash values with some of the most common hashing algorithms.</p>
+<h5 id="hashing">Hashing</h5>
+<p>As you might remember, a hashing algorithm is a cryptographic hash function. It is a mathematical algorithm that maps data of arbitrary size to fixed-size values. Let's take a brief look at the most common hashing algorithms:</p>
+<p><strong>MD5:</strong> Created in 1992 by Ronald Rivest, it takes any input and outputs a 128-bit hash value. Even though MD5 is no longer considered secure for high-level security use cases, such as password storage, it is still broadly used nowadays to verify files' integrity.</p>
+<p><strong>SHA-256:</strong> Part of the <strong>SHA-2</strong> family of functions<strong>, </strong>created by the <a href="https://en.wikipedia.org/wiki/National_Security_Agency" rel="noopener noreferrer nofollow" target="_blank">NSA</a> in 2001. It produces a 256-bit hash value and is mostly used in authentication and encryption protocols, such as SSL and SSH. It is also used for other applications, such as the <a href="https://www.mycryptopedia.com/sha-256-related-bitcoin/" rel="noopener noreferrer nofollow" target="_blank">management of Bitcoin addresses</a> and transactions.</p>
+<p><strong>SHA-512:</strong> Another member of the SHA-2 family of functions; it produces a longer 512-bit hash value, and is commonly used for email address/password hashing and digital record verification. SHA-512 is not as broadly used as SHA-256, because it produces bigger outputs, thus requiring more bandwidth to store and transmit data.</p>
+<p><strong>bcrypt:</strong> A password-hashing function, designed by Niels Provos and David Mazières based on the <a href="https://en.wikipedia.org/wiki/Blowfish_(cipher)" rel="noopener noreferrer nofollow" target="_blank">Blowfish cipher</a> and first published in 1999. It is considered a secure hashing function because it requires a <strong>salt </strong>—<strong> </strong>a random string added to the plaintext password; this added <a href="https://stackabuse.com/hashing-passwords-in-python-with-bcrypt/#:~:text=a%20hashed%20password.-,What%20Is%20Salt%20in%20Password%20Hashing%3F,-As%20cryptography%2C%20price" rel="noopener noreferrer nofollow" target="_blank">"salt"</a> makes the computed hash value unpredictable.</p>
+<h5 id="computing-the-hash-value-of-a-string">Computing the hash value of a string</h5>
+<p>Now that you've been acquainted with some of the most common hashing algorithms, let's take a look at the most basic hashing operation — computing the hash value of a string in Go:</p>
+<pre><code class="language-go">package main
+
+import (
+    "crypto/md5"
+    "crypto/sha256"
+    "crypto/sha512"
+    "fmt"
+)
+
+func main() {
+    md5Hash := md5.New()
+    sha256Hash := sha256.New()
+    sha512Hash := sha512.New()
+
+    md5Hash.Write([]byte("JetBrains Academy"))
+    sha256Hash.Write([]byte("JetBrains Academy"))
+    sha512Hash.Write([]byte("JetBrains Academy"))
+
+    fmt.Printf("%x\n", md5Hash.Sum(nil))
+    fmt.Printf("%x\n", sha256Hash.Sum(nil))
+    fmt.Printf("%x\n", sha512Hash.Sum(nil))
+}
+
+// Output:
+// dc5740934090c9ed7aa0b3ec8ac755f3
+// 83ac28f753df3cd80fee3f8ce1770da805856afa2b48c2917aefe5123723c4c9
+// 97e5ee749844c330b4e99779bf2d6487cd22497fcff0c49cc2d736fcf95374d1...</code></pre>
+<p>Let's examine the above code; the first thing you might notice is that the crypto package itself does not contain any hashing algorithms itself, so we need to import the sub-packages <code class="language-go">md5</code>, <code class="language-go">sha256</code>, and <code class="language-go">sha512</code>.</p>
+<p>The next step is to create a new interface of the <code class="language-go">Hash</code> type with the <code class="language-go">New()</code> function. The most common <a href="https://pkg.go.dev/hash#Hash" rel="noopener noreferrer nofollow" target="_blank">methods</a> of the <code class="language-go">Hash</code> interface are the following:</p>
+<ul>
+<li><code class="language-go">Write()</code> — It takes a slice of bytes as an argument and adds it to the hash that will be calculated.</li>
+<li><code class="language-go">Sum()</code> — Appends a slice of bytes to the current hash and returns the resulting slice. Take notice that in the above example we don't want to append any additional data to the hash we initially passed to <code class="language-go">Write()</code>, so we just pass <code class="language-go">nil</code> as an argument to <code class="language-go">Sum()</code>.</li>
+<li><code class="language-go">Reset()</code> — Resets the hash to one with zero bytes written.</li>
+</ul>
+<p>Finally, to output the computed hash properly, we need to use the <code class="language-go">%x</code> verb. It allows us to format the resulting slice of the <code class="language-go">Sum()</code> method in hexadecimal notation.</p>
+<p></p><div class="alert alert-primary">Notice that the output hash value of the SHA-512 has been shortened because it's quite lengthy. If you want to see the full output, you can <a href="https://go.dev/play/p/xCWtTt9fRsj" rel="noopener noreferrer nofollow" target="_blank">run the above example</a> in the Go Playground.</div><p></p>
+<h5 id="using-bcrypt-for-password-hashing">Using bcrypt for password hashing</h5>
+<p>You might be wondering why we didn't showcase the <code class="language-go">bcrypt</code> algorithm in the previous section. The explanation is simple: since <code class="language-go">bcrypt</code> is not part of the <code class="language-go">crypto</code> package of Go's standard library, we need to use the <code class="language-go">go get</code> command to add it to our Go project:</p>
+<pre><code class="language-bash">$ go get golang.org/x/crypto/bcrypt</code></pre>
+<p>After installing the <code class="language-go">bcrypt</code> package, we'll be able to import and use it within our Go program:</p>
+<pre><code class="language-go">package main
+
+import (
+    "fmt"
+    "log"
+
+    "golang.org/x/crypto/bcrypt"
+)
+
+func main() {
+    password := "TrustNo1"
+    b, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(string(b)) // $2a$14$VCVRDFps04C6lmbRTgmDV.G2L9kZdwxfBfFJzXCEQdNSoTsEdn4Nm
+}</code></pre>
+<p>Computing the hash value of a string (in this case, a password) with the <code class="language-go">bcrypt</code> package is pretty straightforward. We just need to call the <code class="language-go">GenerateFromPassword()</code> function and pass two arguments to it <em>—</em> a slice of bytes <code class="language-go">password</code> and a specific <code class="language-go">cost</code>.</p>
+<p>The <code class="language-go">cost</code> argument is the hashing cost used to create the given password. The higher the value of <code class="language-go">cost</code>, the more computational power will be required to compute the password hash. In this case, we pass the constant <code class="language-go">bcrypt.DefaultCost</code> with the cost of <code class="language-go">10</code>.</p>
+<p></p><div class="alert alert-primary">Keep in mind that the <code class="language-go">bcrypt</code> package has a series of constants defined for costs: <code class="language-go">bcrypt.MinCost = 4</code>, <code class="language-go">bcrypt.MaxCost = 31</code>, and <code class="language-go">bcrypt.DefaultCost = 10</code>. If we pass a cost lower than <code class="language-go">MinCost</code> to <code class="language-go">GenerateFromPassword()</code>, the program will pass <code class="language-go">DefaultCost</code> instead.</div><p></p>
+<p><code class="language-go">GenerateFromPassword()</code> returns a slice of bytes <code class="language-go">b</code> and an error <code class="language-go">err</code>, thus, to properly output the computed hash as a string, we need to cast <code class="language-go">b</code> as a string within the <code class="language-go">fmt.Println()</code> function.</p>
+<h5 id="comparing-a-bcrypt-hash-and-a-plaintext-password">Comparing a bcrypt hash and a plaintext password</h5>
+<p>So far, we've seen how to compute the hash value of a password. However, what if we wanted to compare the computed hash with its possible plaintext equivalent?</p>
+<p>The <code class="language-go">bcrypt</code> package provides a very useful function for this purpose — <code class="language-go">CompareHashAndPassword()</code>. Let's take a look at how we can use it within our Go program:</p>
+<pre><code class="language-go">...
+
+func main() {
+    ... // Compute the hash value of a certain password
+
+    var enteredPassword string
+    fmt.Scanln(&amp;enteredPassword) // Ask the user to enter a plaintext password
+
+    // Compares the 'bcrypt' hashed password with its possible plaintext equivalent:
+    if err := bcrypt.CompareHashAndPassword(b, []byte(enteredPassword)); err != nil {
+        log.Fatal(err) // Exit the program if the hashes of the two passwords do not match
+    }
+    fmt.Println("Passwords match!")
+}
+
+// Input: TrustNo1
+// Output: Passwords match!
+
+// Input: TrustNoOne
+// Output: 2022/03/29 22:11:45 crypto/bcrypt: hashedPassword is not the hash of the given password</code></pre>
+<p>The above example showcases a simple way to use the <code class="language-go">CompareHashAndPassword()</code> function. After we've computed the hash value of a certain password, we can pass a plaintext string containing a password to <code class="language-go">CompareHashAndPassword()</code>, and it will compare the previously <code class="language-go">bcrypt</code> hashed password with the possible equivalent. The function returns <code class="language-go">nil</code> on success and an error <code class="language-go">err</code> on failure.</p>
+<h5 id="computing-the-hash-value-of-a-file">Computing the hash value of a file</h5>
+<p>Apart from computing the hash value of a string, we can also compute the hash value of a file, with the most common use case being verifying a certain file's integrity. Let's take a look at how we can use the previously mentioned hashing algorithms to compute the hash value of the <a href="https://stepik.org/media/attachments/lesson/687612/hello.txt" rel="noopener noreferrer nofollow" target="_blank"><em>hello.txt</em></a> file in Go:</p>
+<pre><code class="language-go">...
+
+func main() {
+    file, err := os.Open("hello.txt")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+
+    md5Hash := md5.New()
+    // Copy the data from 'hello.txt' to the 'md5Hash' interface until reaching EOF:
+    if _, err := io.Copy(md5Hash, file); err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%x\n", md5Hash.Sum(nil)) // e0ede7b570137d20b86ad570db938236
+}</code></pre>
+<p>First, we need to open <em>hello.txt</em> in read-only mode via the <code class="language-go">os.Open()</code> function. Then, we create a new <code class="language-go">Hash</code> interface with the <code class="language-go">New()</code> function within the <code class="language-go">md5Hash</code> variable.</p>
+<p>The next step is the most important part: we need to call the <code class="language-go">io.Copy()</code> function from the <code class="language-go">io</code> package. It will take as an argument a destination, which will be the <code class="language-go">md5Hash</code> interface, and a source <code class="language-go">file</code> to read data from. The <code class="language-go">io.Copy()</code> function will then copy data from the source to the destination until we've reached the end of the <em>hello.txt</em> file.</p>
+<p>After copying all the data to the <code class="language-go">md5Hash</code> interface and reaching the end of the file, we can finally print the computed hash returned by the <code class="language-go">Sum()</code> function, using the <code class="language-go">%x</code> verb. </p>
+<p></p><div class="alert alert-primary">An important detail is that we can't use the <code class="language-go">bcrypt</code> hashing function to calculate the hash value of a file, as it is specifically used to encrypt password strings. However, we can use <code class="language-go">md5</code>, <code class="language-go">sha256</code>, and <code class="language-go">sha512</code> to calculate the hash value of files.</div> <p></p>
+<h5 id="summary">Summary</h5>
+<p>In this topic, we've learned about the most common hashing algorithms and how to use the <code class="language-go">crypto</code> package along with its sub-packages to compute hash values for both strings and files in Go.</p>
+<p>In particular, we've covered how to perform the following hashing operations:</p>
+<ul>
+<li>Creating a <code class="language-go">Hash</code> interface with <code class="language-go">New()</code> function of the <code class="language-go">crypto/md5</code>, <code class="language-go">crypto/sha256</code>, and <code class="language-go">crypto/512</code> packages;</li>
+<li>Using the <code class="language-go">Write()</code> and <code class="language-go">Sum()</code> methods of the <code class="language-go">Hash</code> interface to compute the hash value of a string;</li>
+<li>How to install the <code class="language-go">bcrypt</code> external package using the <code class="language-go">go install</code> command, and then using the <code class="language-go">bcrypt.GenerateFromPassword()</code> function to compute the hash value of a password;</li>
+<li>How to compare a <code class="language-go">bcrypt</code> hash with a plaintext password, using the <code class="language-go">bcrypt.CompareHashAndPassword()</code> function;</li>
+<li>Computing the hash value of a file by copying the data from the file to a previously created <code class="language-go">Hash</code> interface, using the <code class="language-go">io.Copy()</code> function.</li>
+</ul>
+<p>We've also learned that the <code class="language-go">bcrypt</code> hashing algorithm is used specifically to compute hash values for password strings and we can't use it to calculate the hash value of a file.</p>
+<p>Great job, but we're not done yet! Let's go ahead and test our newly acquired knowledge on hashing strings and files with some theory and coding tasks!</p></body></html>
